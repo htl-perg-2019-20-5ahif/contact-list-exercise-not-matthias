@@ -22,12 +22,17 @@ namespace contact_list.Controllers
         [HttpPost]
         public IActionResult AddPerson([FromBody]Person newPerson)
         {
-            people.Add(newPerson);
-            return CreatedAtRoute("GetSpecificItem", new { name = newPerson.LastName }, newPerson);
+            if (people.Where(person => person.Id == newPerson.Id).Count() == 0)
+            {
+                people.Add(newPerson);
+                return Created("", newPerson);
+            }
+
+            return BadRequest("Invalid input(e.g.required field missing or empty)");
         }
 
         [HttpGet]
-        [Route("findByName/{nameFilter}", Name = "GetSpecificItem")]
+        [Route("findByName/{nameFilter}")]
         public IActionResult GetPerson(string nameFilter)
         {
             if (!string.IsNullOrEmpty(nameFilter))
@@ -44,7 +49,12 @@ namespace contact_list.Controllers
         {
             try
             {
-                var person = people.Single(person => person.Id == personId);
+                var person = people.SingleOrDefault(person => person.Id == personId);
+                if (person == null)
+                {
+                    return BadRequest("Invalid ID supplied");
+                }
+
                 people.Remove(person);
                 return NoContent();
             }
@@ -53,7 +63,6 @@ namespace contact_list.Controllers
                 return NotFound("Person not found");
             }
 
-            //return BadRequest("Invalid ID supplied");
         }
     }
 }
