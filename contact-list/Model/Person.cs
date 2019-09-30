@@ -6,7 +6,7 @@ namespace contact_list
     public class Person
     {
         [Required]
-        public int? Id { get; set; }
+        public int Id { get; set; }
 
         public string FirstName { get; set; }
 
