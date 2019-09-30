@@ -22,7 +22,7 @@ namespace contact_list.Controllers
         [HttpPost]
         public IActionResult AddPerson([FromBody]Person newPerson)
         {
-            if (newPerson.Email == null || newPerson.Id == null)
+            if (newPerson.Email == null || newPerson.Id == 0)
             {
                 return BadRequest("Invalid input (e.g. required field missing or empty)");
             }
@@ -40,12 +40,12 @@ namespace contact_list.Controllers
         [Route("findByName")]
         public IActionResult GetPerson([FromQuery] string nameFilter)
         {
-            if (!string.IsNullOrEmpty(nameFilter))
+            if (string.IsNullOrEmpty(nameFilter))
             {
-                return Ok(people.Where(person => person.LastName.Contains(nameFilter)));
+                return BadRequest("Invalid or missing name");
             }
 
-            return BadRequest("Invalid or missing name");
+            return Ok(people.Where(person => person.LastName.Contains(nameFilter)));
         }
 
         [HttpDelete]
