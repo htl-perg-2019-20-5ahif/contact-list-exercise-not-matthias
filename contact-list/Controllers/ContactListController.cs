@@ -22,18 +22,23 @@ namespace contact_list.Controllers
         [HttpPost]
         public IActionResult AddPerson([FromBody]Person newPerson)
         {
-            if (people.Where(person => person.Id == newPerson.Id).Count() == 0)
+            if (newPerson.Email == null || newPerson.Id == 0)
             {
-                people.Add(newPerson);
-                return Created("", newPerson);
+                return BadRequest("Invalid input (e.g. required field missing or empty)");
             }
 
-            return BadRequest("Invalid input(e.g.required field missing or empty)");
+            if (people.Any(person => person.Id == newPerson.Id))
+            {
+                return BadRequest("Person already existing.");
+            }
+
+            people.Add(newPerson);
+            return Created("", newPerson);
         }
 
         [HttpGet]
-        [Route("findByName/{nameFilter}")]
-        public IActionResult GetPerson(string nameFilter)
+        [Route("findByName")]
+        public IActionResult GetPerson([FromQuery] string nameFilter)
         {
             if (!string.IsNullOrEmpty(nameFilter))
             {
