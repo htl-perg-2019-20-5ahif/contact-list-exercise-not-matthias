@@ -22,7 +22,7 @@ namespace contact_list.Controllers
         [HttpPost]
         public IActionResult AddPerson([FromBody]Person newPerson)
         {
-            if (newPerson.Email == null || newPerson.Id == 0)
+            if (newPerson.Email == null || newPerson.Id == null)
             {
                 return BadRequest("Invalid input (e.g. required field missing or empty)");
             }
@@ -52,22 +52,19 @@ namespace contact_list.Controllers
         [Route("{personId}")]
         public IActionResult DeleteItem(int personId)
         {
-            try
+            if (personId <= 0 && personId > people.Count)
             {
-                var person = people.SingleOrDefault(person => person.Id == personId);
-                if (person == null)
-                {
-                    return BadRequest("Invalid ID supplied");
-                }
-
-                people.Remove(person);
-                return NoContent();
+                return BadRequest("Invalid ID supplied");
             }
-            catch (Exception)
+
+            var person = people.SingleOrDefault(person => person.Id == personId);
+            if (person == null)
             {
                 return NotFound("Person not found");
             }
-
+            
+            people.Remove(person);
+            return NoContent();
         }
     }
 }
